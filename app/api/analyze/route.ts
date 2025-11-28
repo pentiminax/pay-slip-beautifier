@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
 
         const response = await result.response
         const text = response.text()
-        console.log("Gemini response:", text)
 
         // Clean up markdown if present
         const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim()
