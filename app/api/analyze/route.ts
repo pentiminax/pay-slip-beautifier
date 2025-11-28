@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,38 +10,76 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 })
         }
 
-        // In a real app, we would parse the PDF here.
-        // For this demo, we'll return a high-fidelity mock analysis
-        // to demonstrate the UI and visualization capabilities.
-
-        // Mock data
-        const net = 2450.50
-        const brut = 3200.00
-        const taxes = brut - net
-
-        const analysis = {
-            period: "Novembre 2023",
-            employee: "John Doe",
-            employer: "Acme Corp",
-            summary: {
-                net: net,
-                gross: brut,
-                taxes: taxes,
-                employerCost: brut * 1.45 // Estimate
-            },
-            details: [
-                { label: "Salaire de base", amount: brut, type: "income" },
-                { label: "CSG/CRDS", amount: taxes * 0.3, type: "deduction", description: "Contribution Sociale Généralisée / Contribution au Remboursement de la Dette Sociale. Sert à financer la sécurité sociale." },
-                { label: "Assurance Maladie", amount: taxes * 0.1, type: "deduction", description: "Couvre vos frais de santé." },
-                { label: "Retraite", amount: taxes * 0.4, type: "deduction", description: "Cotisations pour votre future retraite." },
-                { label: "Chômage", amount: taxes * 0.1, type: "deduction", description: "Assurance en cas de perte d'emploi." },
-                { label: "Prévoyance", amount: taxes * 0.1, type: "deduction", description: "Couverture complémentaire (décès, invalidité)." }
-            ]
+        const apiKey = process.env.GEMINI_API_KEY
+        if (!apiKey) {
+            return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 })
         }
 
-        return NextResponse.json(analysis)
-    } catch (error) {
+        const arrayBuffer = await file.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+        const base64Data = buffer.toString("base64")
+
+        const genAI = new GoogleGenerativeAI(apiKey)
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" })
+
+        const prompt = `
+      Analyze this French payslip (bulletin de paie) and extract the following information in a structured JSON format.
+      Do not include markdown formatting (like \`\`\`json), just return the raw JSON object.
+      
+      Structure:
+      {
+        "period": "Month Year (e.g. Novembre 2023)",
+        "employee": "Employee Name",
+        "employer": "Employer Name",
+        "summary": {
+          "net": number (Net à payer),
+          "gross": number (Total Brut),
+          "taxes": number (Total charges salariales),
+          "employerCost": number (Total chargé or estimate)
+        },
+        "details": [
+          {
+            "label": "Name of the line item (e.g. CSG, Assurance Maladie)",
+            "amount": number (The amount deducted or added),
+            "type": "deduction" | "income",
+            "description": "A simplified explanation of what this charge is for in French (vulgarisation)"
+          }
+        ]
+      }
+
+      For the "details" array, group the main categories of taxes (Health, Retirement, Unemployment, CSG/CRDS) and provide a simplified description for each.
+      Ensure all numbers are parsed correctly as floats.
+    `
+
+        const result = await model.generateContent([
+            prompt,
+            {
+                inlineData: {
+                    data: base64Data,
+                    mimeType: "application/pdf",
+                },
+            },
+        ])
+
+        const response = await result.response
+        const text = response.text()
+        console.log("Gemini response:", text)
+
+        // Clean up markdown if present
+        const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim()
+        try {
+            const analysis = JSON.parse(jsonString)
+            return NextResponse.json(analysis)
+        } catch (e) {
+            console.error("Failed to parse JSON:", jsonString)
+            return NextResponse.json({ error: "Failed to parse AI response as JSON", details: text }, { status: 500 })
+        }
+    } catch (error: any) {
         console.error("Error processing PDF:", error)
-        return NextResponse.json({ error: "Failed to process PDF" }, { status: 500 })
+        return NextResponse.json({
+            error: "Failed to process PDF",
+            details: error.message || String(error),
+            stack: error.stack
+        }, { status: 500 })
     }
 }
