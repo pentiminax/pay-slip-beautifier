@@ -1,4 +1,7 @@
 import { motion } from "framer-motion"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
 
 export function HeroSection() {
     return (
@@ -6,7 +9,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4"
+            className="space-y-6"
         >
             <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-2">
                 AI-Powered Payslip Analyzer
@@ -18,6 +21,14 @@ export function HeroSection() {
                 Upload your French payslip and get a clear, visualized breakdown of your
                 salary, taxes, and benefits. No more confusion.
             </p>
+
+            <div className="flex justify-center">
+                <Link href="/demo">
+                    <Button variant="link" className="text-muted-foreground hover:text-primary">
+                        Try with a demo payslip <ArrowRight className="ml-1 h-4 w-4" />
+                    </Button>
+                </Link>
+            </div>
         </motion.div>
     )
 }
