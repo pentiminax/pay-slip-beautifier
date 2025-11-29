@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" })
 
         const prompt = `
-      Analyze this French payslip (bulletin de paie) and extract the following information in a structured JSON format.
+      Analyze this payslip and extract the following information in a structured JSON format.
       Do not include markdown formatting (like \`\`\`json), just return the raw JSON object.
       
       Structure:
