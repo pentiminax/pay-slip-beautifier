@@ -14,9 +14,16 @@ export async function analyzePayslip(file: File): Promise<PayslipData> {
     const formData = new FormData()
     formData.append("file", file)
 
+    const headers: HeadersInit = {}
+    const apiKey = localStorage.getItem("gemini_api_key")
+    if (apiKey) {
+        headers["X-Gemini-API-Key"] = apiKey
+    }
+
     const response = await fetch("/api/analyze", {
         method: "POST",
         body: formData,
+        headers,
     })
 
     if (!response.ok) {
