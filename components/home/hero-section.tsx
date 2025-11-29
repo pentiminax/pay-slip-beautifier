@@ -15,10 +15,10 @@ export function HeroSection() {
                 AI-Powered Payslip Analyzer
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">
-                Understand Your <span className="text-primary">Paycheck</span>
+                Understand Your <span className="text-primary">Payslip</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Upload your French payslip and get a clear, visualized breakdown of your
+                Upload your payslip and get a clear, visualized breakdown of your
                 salary, taxes, and benefits. No more confusion.
             </p>
 
