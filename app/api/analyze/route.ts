@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         }
 
         const apiKey = req.headers.get("X-Gemini-API-Key") || process.env.GEMINI_API_KEY
-        console.log("API Key present:", !!apiKey)
+
         if (!apiKey) {
             return NextResponse.json({ error: "GEMINI_API_KEY is not set. Please configure it in settings" }, { status: 500 })
         }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         const base64Data = buffer.toString("base64")
 
         const genAI = new GoogleGenerativeAI(apiKey)
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" })
+        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" })
 
         const prompt = `
       Analyze this payslip and extract the following information in a structured JSON format.
