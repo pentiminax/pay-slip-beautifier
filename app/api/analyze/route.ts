@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         const apiKey = req.headers.get("X-Gemini-API-Key") || process.env.GEMINI_API_KEY
         console.log("API Key present:", !!apiKey)
         if (!apiKey) {
-            return NextResponse.json({ error: "GEMINI_API_KEY is not set. Please configure it in settings or .env" }, { status: 500 })
+            return NextResponse.json({ error: "GEMINI_API_KEY is not set. Please configure it in settings" }, { status: 500 })
         }
 
         const arrayBuffer = await file.arrayBuffer()
