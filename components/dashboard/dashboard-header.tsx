@@ -17,9 +17,9 @@ export function DashboardHeader({ period, employee, employer }: DashboardHeaderP
                 <Button
                     variant="ghost"
                     className="pl-0 hover:pl-2 transition-all"
-                    onClick={() => router.push("/")}
+                    onClick={() => router.push("/dashboard")}
                 >
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Upload
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to History
                 </Button>
                 <h1 className="text-3xl font-bold tracking-tight">Payslip Analysis</h1>
                 <p className="text-muted-foreground">
