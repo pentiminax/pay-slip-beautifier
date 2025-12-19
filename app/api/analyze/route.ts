@@ -66,20 +66,22 @@ export async function POST(req: NextRequest) {
         const text = response.text()
 
         // Clean up markdown if present
-        const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim()
-        try {
-            const analysis = JSON.parse(jsonString)
-            return NextResponse.json(analysis)
-        } catch (e) {
-            console.error("Failed to parse JSON:", jsonString)
-            return NextResponse.json({ error: "Failed to parse AI response as JSON", details: text }, { status: 500 })
-        }
-    } catch (error: any) {
-        console.error("Error processing PDF:", error)
-        return NextResponse.json({
-            error: "Failed to process PDF",
-            details: error.message || String(error),
-            stack: error.stack
-        }, { status: 500 })
-    }
-}
+	        const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim()
+	        try {
+	            const analysis = JSON.parse(jsonString)
+	            return NextResponse.json(analysis)
+	        } catch {
+	            console.error("Failed to parse JSON:", jsonString)
+	            return NextResponse.json({ error: "Failed to parse AI response as JSON", details: text }, { status: 500 })
+	        }
+	    } catch (error: unknown) {
+	        console.error("Error processing PDF:", error)
+	        const message = error instanceof Error ? error.message : String(error)
+	        const stack = error instanceof Error ? error.stack : undefined
+	        return NextResponse.json({
+	            error: "Failed to process PDF",
+	            details: message,
+	            stack
+	        }, { status: 500 })
+	    }
+	}

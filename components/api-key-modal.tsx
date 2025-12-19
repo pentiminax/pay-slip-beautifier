@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Settings, Key } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,12 +19,13 @@ export function ApiKeyModal() {
     const [apiKey, setApiKey] = useState("")
     const [isOpen, setIsOpen] = useState(false)
 
-    useEffect(() => {
-        const storedKey = localStorage.getItem("gemini_api_key")
-        if (storedKey) {
+    const handleOpenChange = (open: boolean) => {
+        if (open) {
+            const storedKey = localStorage.getItem("gemini_api_key") || ""
             setApiKey(storedKey)
         }
-    }, [])
+        setIsOpen(open)
+    }
 
     const handleSave = () => {
         if (apiKey.trim()) {
@@ -36,7 +37,7 @@ export function ApiKeyModal() {
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
                     <Settings className="h-4 w-4" />
@@ -66,7 +67,7 @@ export function ApiKeyModal() {
                             />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            Don't have a key? <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Get one here</a>.
+                            Need a key? <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Get one here</a>.
                         </p>
                     </div>
                 </div>

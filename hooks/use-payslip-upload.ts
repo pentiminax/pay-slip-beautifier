@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { analyzePayslip, ApiError } from "@/lib/api-client"
+import { addPayslip } from "@/lib/storage"
 
 export function usePayslipUpload() {
     const [isUploading, setIsUploading] = useState(false)
@@ -15,9 +16,8 @@ export function usePayslipUpload() {
 
             const data = await analyzePayslip(file)
 
-            // Store data in localStorage to pass to dashboard
-            localStorage.setItem("payslipData", JSON.stringify(data))
-            router.push("/dashboard")
+            const saved = addPayslip(data, { fileName: file.name })
+            router.push(`/dashboard/${saved.id}`)
         } catch (error) {
             console.error("Error uploading file:", error)
 
